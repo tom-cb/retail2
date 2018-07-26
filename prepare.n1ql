@@ -1,0 +1,1 @@
+PREPARE price_lookup FROM select store_prices[0] from pricing2 USE KEYS $id
