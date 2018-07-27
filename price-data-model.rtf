@@ -1,0 +1,364 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1561\cocoasubrtf400
+{\fonttbl\f0\fnil\fcharset0 HelveticaNeue;\f1\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;\red38\green38\blue38;\red255\green255\blue255;\red0\green0\blue0;
+}
+{\*\expandedcolortbl;;\cssrgb\c20000\c20000\c20000;\cssrgb\c100000\c100000\c100000;\cssrgb\c0\c0\c0;
+}
+\paperw11900\paperh16840\margl1440\margr1440\vieww38700\viewh20960\viewkind0
+\deftab720
+\pard\pardeftab720\partightenfactor0
+
+\f0\fs28 \cf2 \cb3 \expnd0\expndtw0\kerning0
+r3t41l
+\f1\fs24 \cf0 \cb1 \kerning1\expnd0\expndtw0 \
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+\cf0 \
+\
+Historical and current prices of a product in a specific store\
+\
+\{\
+  "type": "store_prod",\
+  "store_grp": 1,\
+  "store_id": 1,\
+  "prod_id": 1,\
+  "store_prices": [\{\
+    "date": "2018-07-25",\
+    "reason": "ZZZ",\
+    "price": 10.00\
+  \}, \{\
+    "date": "2018-06-25",\
+    "reason": "YYY",\
+    "price": 20.00\
+  \}, \{\
+    "date": "2018-05-25",\
+    "reason": "XXX",\
+    "price": 30.00\
+  \}]\
+\}\
+\
+\
+Historical and current prices for a store group\
+\
+\{\
+  "type": "grp",\
+  "store_grp": 1,\
+  "prod_id": 1,\
+  "store_grp_prices": [\{\
+    "date": "2018-07-25",\
+    "reason": "ABC",\
+    "price": 10.00\
+  \}, \{\
+    "date": "2018-06-25",\
+    "reason": "DEF",\
+    "price": 20.00\
+  \}, \{\
+    "date": "2018-05-25",\
+    "reason": "GHJ",\
+    "price": 30.00\
+  \}]\
+\}\
+\
+\
+\
+\
+
+\b GSI INDEXES\
+
+\b0 \
+\pard\pardeftab720\sl280\sa120\partightenfactor0
+\cf4 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec4 CREATE INDEX `group_ids_product_ids` ON `pricing3`(`store_group_id`,`product_id`) WHERE (`type` = "store_group_product") WITH \{ "defer_build":true \}\
+CREATE INDEX `store_id_prod_id` ON `pricing3`(`store_id`,`product_id`) WHERE (`type` = "store_product") WITH \{ "defer_build":true \}\
+CREATE INDEX `store_product_ids` ON `pricing3`(`product_id`) WHERE (`type` = "store_product") WITH \{ "defer_build":true \}\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+\cf0 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 \
+BUILD INDEX ON pricing3(group_ids_product_ids, store_id_prod_id, store_product_ids) USING GSI\
+\
+\pard\pardeftab720\sl280\sa120\partightenfactor0
+\cf4 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec4 CREATE INDEX `store_product_product_ids_group_ids` ON `pricing3`(`product_id`,`store_group_id`) WHERE (`type` = "store_product")\
+CREATE INDEX `store_group_product_ids_store_group_ids` ON `pricing3`(`product_id`,`store_group_id`) WHERE (`type` = "store_group_product")\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+\cf0 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 \
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+\cf0 \
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+
+\b \cf0 Latest price of a product in a store:\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+
+\b0 \cf0 \
+select store_pricing.store_id, \
+       store_pricing.product_id, \
+       store_pricing.store_group_id,\
+       store_pricing.store_prices[0:1] as latest_store_price\
+\
+FROM pricing3 as store_pricing\
+   WHERE store_pricing.type="store_product"\
+   AND store_pricing.product_id = 1\
+   AND store_pricing.store_id = 1;\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+\cf0 \
+
+\b Latest prices of a product at both the store level, and the group level for that store:\
+
+\b0 \
+select store_pricing.store_id, \
+       store_pricing.product_id, \
+       store_pricing.store_group_id,\
+       store_pricing.store_prices[0:1] as latest_store_prices,\
+       group_pricing.store_group_prices[0:1] as latest_group_prices\
+\
+FROM pricing3 as store_pricing\
+ JOIN pricing3 as group_pricing  \
+ ON store_pricing.store_group_id = group_pricing.store_group_id\
+   WHERE store_pricing.type="store_product"\
+   AND group_pricing.type="store_group_product"\
+   AND store_pricing.store_id = 100\
+   AND group_pricing.product_id = 20001\
+   AND store_pricing.product_id = 20001\
+\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+
+\b \cf0 Lowest price at a specific store\
+\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+
+\b0 \cf0 TODO: try this instead of ARRAY.. IN .. END
+\b \
+
+\b0   store_pricing.store_prices[*].price
+\b \
+\
+
+\b0 select store_pricing.store_id, \
+       store_pricing.product_id, \
+       ARRAY_MIN(ARRAY p.price for p in store_pricing.store_prices END) AS min_store_price\
+FROM pricing3 as store_pricing\
+   WHERE store_pricing.type="store_product"\
+   AND store_pricing.store_id = 1\
+   AND store_pricing.product_id = 2;\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+\cf0 \
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+
+\b \cf0 Lowest price in a store group for a specific product\
+\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+
+\b0 \cf0 SELECT\
+  store_pricing.store_group_id,\
+  ARRAY_MIN(ARRAY p.price for p in MIN(store_pricing.store_prices) END) AS min_store_price\
+FROM pricing as store_pricing\
+   WHERE store_pricing.type="store_product"\
+   AND store_pricing.product_id = 2\
+   GROUP BY store_pricing.store_group_id;\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+\cf0 \
+
+\b Find most recent price for all products for all stores in a specific group\
+=> this is 200k+ results, probably not a good query\
+
+\b0 => we are getting both the store specific and group level price here\'85 seems super inefficient if we\'92re looking at one group.\
+=> Do we need the join strictly like this?\
+\
+select store_pricing.store_id, \
+       store_pricing.product_id, \
+       store_pricing.store_group_id,\
+       store_pricing.store_prices[0:1] as latest_store_prices,\
+       group_pricing.store_group_prices[0:1] as latest_group_prices\
+\
+FROM pricing as store_pricing\
+ JOIN pricing as group_pricing  USE HASH(BUILD)\
+ ON store_pricing.store_group_id = group_pricing.store_group_id\
+ AND store_pricing.product_id = group_pricing.product_id \
+   WHERE store_pricing.type="store_product"\
+   AND group_pricing.type="store_group_product"\
+   AND store_pricing.store_group_id = 1;\
+\
+Alternative:\
+\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+\cf0 \
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+
+\b \cf0 For a specific list of stores\
+
+\b0 \
+select store_pricing.store_id, \
+       store_pricing.product_id, \
+       store_pricing.store_group_id,\
+       store_pricing.store_prices[0:1] as latest_store_prices,\
+       group_pricing.store_group_prices[0:1] as latest_group_prices\
+\
+FROM pricing3 as store_pricing\
+ JOIN pricing3 as group_pricing  USE HASH(BUILD)\
+ ON store_pricing.store_group_id = group_pricing.store_group_id\
+ AND store_pricing.product_id = group_pricing.product_id\
+\
+   WHERE store_pricing.type="store_product"\
+   AND group_pricing.type="store_group_product"\
+   AND store_pricing.store_id IN ([1,2,3,4,5]);\
+\
+
+\b For a specific list of products\
+
+\b0 \
+select store_pricing.store_id, \
+       store_pricing.product_id, \
+       store_pricing.store_group_id,\
+       store_pricing.store_prices[0:4] as latest_store_prices,\
+       group_pricing.store_group_prices[0:1] as latest_group_prices\
+\
+FROM pricing3 as store_pricing\
+ JOIN pricing3 as group_pricing  USE HASH(BUILD)\
+ ON store_pricing.store_group_id = group_pricing.store_group_id\
+ AND store_pricing.product_id = group_pricing.product_id \
+   WHERE store_pricing.type="store_product"\
+   AND group_pricing.type="store_group_product"\
+   AND store_pricing.product_id IN ([1,2,3])\
+\
+^^ syntax error?\
+\
+Currently idx used:\
+\pard\pardeftab720\sl280\partightenfactor0
+\cf2 \cb3 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 store_prod_group_id\
+store_product_ids\
+\
+Other side:\
+group_ids_product_ids\
+\cf0 \cb1 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 \
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+\cf0 Look to change index def to include:\
+\
+select store_pricing.store_id, \
+       store_pricing.product_id, \
+       store_pricing.store_group_id,\
+       store_pricing.store_prices[0:4] as latest_store_prices,\
+       group_pricing.store_group_prices[0:1] as latest_group_prices\
+\
+FROM pricing3 as store_pricing\
+ JOIN pricing3 as group_pricing  \
+ ON store_pricing.store_group_id = group_pricing.store_group_id\
+ AND store_pricing.product_id = group_pricing.product_id \
+   WHERE store_pricing.type="store_product"\
+   AND group_pricing.type="store_group_product"\
+   AND store_pricing.product_id IN ([20001,20002])\
+\
+\
+TAKE 4:\
+\
+select store_pricing.store_id, \
+       store_pricing.product_id, \
+       store_pricing.store_group_id,\
+       store_pricing.store_prices[0:4] as latest_store_prices,\
+       group_pricing.store_group_prices[0:1] as latest_group_prices\
+\
+FROM pricing3 as group_pricing \
+\
+ JOIN pricing3 as store_pricing\
+ \
+ ON store_pricing.store_group_id = group_pricing.store_group_id\
+ AND group_pricing.type="store_group_product"\
+ AND store_pricing.product_id = group_pricing.product_id\
+ AND group_pricing.product_id IN ([20001,20002])\
+   AND store_pricing.product_id IN ([20001,20002])\
+   AND store_pricing.type="store_product"\
+
+\b \
+
+\b0 \
+\
+\
+*******************\
+
+\b SUBDOC OPS
+\b0 \
+\
+CLI Tool:\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+\cf0  get -p store_prices[0] -p store_prices[1] -p store_prices[2] store::1000::product::1\
+\
+Via N1QL\
+\
+select store_prices[0] from pricing2 USE KEYS 'store::100::product::9'\
+\
+PREPARE price_lookup FROM select store_prices[0] from pricing2 USE KEYS $id\
+\
+\
+Gen files to input to n1qlback using:\
+\
+gen-prepared-price-lookup.sh\
+gen-price-lookup.sh\
+\
+Outputs\'85\
+\{"prepared":"price_lookup","$id":"store::100::product::9"\}\
+\
+\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+\cf0 ****************\
+\
+
+\b ANALYTICS
+\b0 \
+\
+SETUP:\
+\
+CREATE BUCKET pricing3 WITH \{ "name":"pricing3" \};\
+\
+CREATE DATASET store_products ON pricing3 WHERE `type`='store_product';\
+CREATE DATASET store_group_products ON pricing3 WHERE `type`='store_group_product';\
+\
+CONNECT BUCKET pricing3;\
+\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+
+\b \cf0 For a specific list of products\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+
+\b0 \cf0 \
+\
+This style:\
+\pard\pardeftab720\sl280\partightenfactor0
+\cf4 \cb3 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec4 elapsed: 77.45s |\'a0execution: 77.43s |\'a0count: 100 |\'a0size: 81703 |\'a0processed objects: 90404627\
+\cf0 \cb1 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 \
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+\cf0 select store_pricing.store_id, \
+       store_pricing.product_id, \
+       store_pricing.store_group_id,\
+       store_pricing.store_prices as latest_store_prices,\
+       group_pricing.store_group_prices as latest_group_prices\
+\
+FROM store_products as store_pricing\
+ JOIN store_group_products as group_pricing \
+ ON store_pricing.store_group_id = group_pricing.store_group_id\
+ AND store_pricing.product_id = group_pricing.product_id \
+   WHERE store_pricing.`type`="store_product"\
+   AND group_pricing.`type`="store_group_product"\
+   AND store_pricing.product_id IN ([10000])\
+\
+\
+\
+REMOVED WHERE type checks:\
+\pard\pardeftab720\sl280\partightenfactor0
+\cf4 \cb3 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec4 elapsed: 277.93s |\'a0execution: 277.92s |\'a0count: 100 |\'a0size: 81703 |\'a0processed objects: 90404627\
+\cf0 \cb1 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 \
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+\cf0 select store_pricing.store_id, \
+       store_pricing.product_id, \
+       store_pricing.store_group_id,\
+       store_pricing.store_prices as latest_store_prices,\
+       group_pricing.store_group_prices as latest_group_prices\
+\
+FROM store_products as store_pricing\
+ JOIN store_group_products as group_pricing \
+ ON store_pricing.store_group_id = group_pricing.store_group_id\
+ AND store_pricing.product_id = group_pricing.product_id \
+   AND store_pricing.product_id IN ([10000])\
+\
+\
+}
