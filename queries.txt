@@ -44,4 +44,16 @@ FROM pricing AS store_pricing
    AND store_pricing.product_id = 10000
 
 
+INDEXES
+
+CREATE INDEX `store_id_prod_id` ON `pricing3`(`store_id`,`product_id`) WHERE (`type` = "store_product") WITH { "defer_build":true }
+
+CREATE INDEX `store_group_product_ids_store_group_ids` ON `pricing3`(`product_id`,`store_group_id`) WHERE (`type` = "store_group_product") WITH { "defer_build":true }
+CREATE INDEX `store_product_group_ids_product_ids` ON `pricing3`(`store_group_id`,`product_id`) WHERE (`type` = "store_product") WITH { "defer_build":true }
+
+
+
+
+
+
 
