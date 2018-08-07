@@ -1,0 +1,47 @@
+QUERIES
+
+
+o All prices of a product in a store:
+
+select store_pricing.store_id, 
+       store_pricing.product_id, 
+       store_pricing.store_group_id,
+       store_pricing.store_prices[0] as latest_store_price
+
+FROM pricing as store_pricing
+   WHERE store_pricing.type="store_product"
+   AND store_pricing.product_id = 1
+   AND store_pricing.store_id = 1;
+
+
+
+o Latest price of a product in a store:
+
+SELECT 
+       store_pricing.store_id, 
+       store_pricing.product_id, 
+       store_pricing.store_prices[0] as latest_store_price
+FROM pricing as store_pricing
+   WHERE store_pricing.type="store_product"
+   AND store_pricing.product_id = 1
+   AND store_pricing.store_id = 1;
+
+
+o Latest price of a product at both store and store group level:
+
+SELECT store_pricing.store_id, store_pricing.product_id, store_pricing.store_group_id,
+       store_pricing.store_prices[0] as latest_store_prices,
+       group_pricing.store_group_prices[0] as latest_group_prices
+
+FROM pricing AS store_pricing
+ JOIN pricing AS group_pricing
+ ON store_pricing.store_group_id = group_pricing.store_group_id
+
+   WHERE store_pricing.type = "store_product"
+   AND group_pricing.type="store_group_product"
+   AND store_pricing.store_id = 100
+   AND group_pricing.product_id = 20001
+   AND store_pricing.product_id = 10000
+
+
+
