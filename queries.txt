@@ -6,7 +6,7 @@ o All prices of a product in a store:
 select store_pricing.store_id, 
        store_pricing.product_id, 
        store_pricing.store_group_id,
-       store_pricing.store_prices[0] as latest_store_price
+       store_pricing.store_prices as latest_store_prices
 
 FROM pricing as store_pricing
    WHERE store_pricing.type="store_product"
@@ -92,12 +92,15 @@ FROM pricing as group_pricing
    AND store_pricing.product_id IN ([20001,20002])
    AND store_pricing.type="store_product"
 
+
+
+
 INDEXES
 
-CREATE INDEX `store_id_prod_id` ON `pricing3`(`store_id`,`product_id`) WHERE (`type` = "store_product") WITH { "defer_build":true }
+CREATE INDEX `store_id_prod_id` ON `pricing`(`store_id`,`product_id`) WHERE (`type` = "store_product") WITH { "defer_build":true }
 
-CREATE INDEX `store_group_product_ids_store_group_ids` ON `pricing3`(`product_id`,`store_group_id`) WHERE (`type` = "store_group_product") WITH { "defer_build":true }
-CREATE INDEX `store_product_group_ids_product_ids` ON `pricing3`(`store_group_id`,`product_id`) WHERE (`type` = "store_product") WITH { "defer_build":true }
+CREATE INDEX `store_group_product_ids_store_group_ids` ON `pricing`(`product_id`,`store_group_id`) WHERE (`type` = "store_group_product") WITH { "defer_build":true }
+CREATE INDEX `store_product_group_ids_product_ids` ON `pricing`(`store_group_id`,`product_id`) WHERE (`type` = "store_product") WITH { "defer_build":true }
 
 CREATE INDEX `store_id_prod_id` ON `pricing`(`store_id`,`product_id`) WHERE (`type` = "store_product")  WITH { "defer_build":true }
 
