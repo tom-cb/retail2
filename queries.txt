@@ -44,6 +44,18 @@ FROM pricing AS store_pricing
    AND store_pricing.product_id = 20001
 
 
+
+o Minimum price a product has been sold for at a store
+
+select store_pricing.store_id, 
+       store_pricing.product_id, 
+       ARRAY_MIN(ARRAY p.price for p in store_pricing.store_prices END) AS min_store_price
+FROM pricing as store_pricing
+   WHERE store_pricing.type="store_product"
+   AND store_pricing.store_id = 100
+   AND store_pricing.product_id = 2000;
+
+
 o For a specific list of products across stores and store groups
 
 select store_pricing.store_id, 
