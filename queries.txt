@@ -91,3 +91,4 @@ cbc-n1qlback  -f most-recent-price.n1ql -u Administrator -P g0ne8ang -U couchbas
 
 PREPARE price_lookup FROM select store_prices[0] from pricing USE KEYS $id
 
+cbc-n1qlback  -f prepared-most-recent-price.n1ql -u Administrator -P g0ne8ang -U couchbase://ec2-34-255-211-122.eu-west-1.compute.amazonaws.com/pricing 
