@@ -1,0 +1,23 @@
+Cluster:
+
+Data:
+ec2-34-241-115-131.eu-west-1.compute.amazonaws.com
+ec2-34-242-93-38.eu-west-1.compute.amazonaws.com
+ec2-34-251-53-231.eu-west-1.compute.amazonaws.com
+
+IQ:
+
+ec2-34-248-122-150.eu-west-1.compute.amazonaws.com
+ec2-52-49-26-97.eu-west-1.compute.amazonaws.com
+
+
+Spare CB Nodes:
+ec2-34-242-83-130.eu-west-1.compute.amazonaws.com
+ec2-54-72-60-156.eu-west-1.compute.amazonaws.com
+
+App Server Nodes:
+
+ec2-52-211-90-14.eu-west-1.compute.amazonaws.com
+ec2-34-241-234-95.eu-west-1.compute.amazonaws.com
+ec2-52-18-230-113.eu-west-1.compute.amazonaws.com
+
