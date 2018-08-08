@@ -84,7 +84,10 @@ CREATE INDEX `store_product_group_ids_product_ids` ON `pricing3`(`store_group_id
 
 
 
+LOAD GEN
+
+cbc-n1qlback  -f most-recent-price.n1ql -u Administrator -P g0ne8ang -U couchbase://ec2-34-255-211-122.eu-west-1.compute.amazonaws.com/pricing
 
 
-
+PREPARE price_lookup FROM select store_prices[0] from pricing USE KEYS $id
 
