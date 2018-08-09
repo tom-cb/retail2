@@ -40,8 +40,8 @@ FROM pricing AS store_pricing
    WHERE store_pricing.type = "store_product"
    AND group_pricing.type="store_group_product"
    AND store_pricing.store_id = 100
-   AND group_pricing.product_id = 20001
-   AND store_pricing.product_id = 20001
+   AND group_pricing.product_id = 10001
+   AND store_pricing.product_id = 10001
 
 
 
@@ -88,8 +88,8 @@ FROM pricing as group_pricing
  ON store_pricing.store_group_id = group_pricing.store_group_id
  AND group_pricing.type="store_group_product"
  AND store_pricing.product_id = group_pricing.product_id
- AND group_pricing.product_id IN ([20001,20002])
-   AND store_pricing.product_id IN ([20001,20002])
+ AND group_pricing.product_id IN ([10001,10002])
+   AND store_pricing.product_id IN ([10001,10002])
    AND store_pricing.type="store_product"
 
 
@@ -109,9 +109,9 @@ CREATE INDEX `store_id_prod_id` ON `pricing`(`store_id`,`product_id`) WHERE (`ty
 
 LOAD GEN
 
-cbc-n1qlback  -f most-recent-price.n1ql -u Administrator -P g0ne8ang -U couchbase://ec2-34-255-211-122.eu-west-1.compute.amazonaws.com/pricing
+cbc-n1qlback  -f most-recent-price.n1ql -u Administrator -P g0ne8ang -U couchbase://ec2-34-242-93-38.eu-west-1.compute.amazonaws.com/pricing
 
 
 PREPARE price_lookup FROM select store_prices[0] from pricing USE KEYS $id
 
-cbc-n1qlback  -f prepared-most-recent-price.n1ql -u Administrator -P g0ne8ang -U couchbase://ec2-34-255-211-122.eu-west-1.compute.amazonaws.com/pricing 
+cbc-n1qlback  -f prepared-most-recent-price.n1ql -u Administrator -P g0ne8ang -U couchbase://ec2-34-242-93-38.eu-west-1.compute.amazonaws.com/pricing 
